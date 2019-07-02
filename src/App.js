@@ -71,14 +71,14 @@ class App extends React.Component {
         <div>
           <div>Dealer!</div>
           <Hand cards={dealerHand} hideFirstCard={hideFirstCard} />
-          <div>The dealer's score is {scoreCalculator(dealerHand)}</div>
+          {roundOver && <div>The dealer's score is {scoreCalculator(dealerHand)}</div>}
         </div>
         {gameOverMan && <CompletionTile restartGame={this.restartGame} winner={winner}/>}
         <div>
           {!gameOverMan &&
           <React.Fragment>
-            <Button onClick={this.getCard} color="pink">Hit meh</Button>
-            <Button onClick={this.endRound} color="pink">Stand down</Button>
+            <Button onClick={this.getCard} color="cornflowerblue">Hit meh</Button>
+            <Button onClick={this.endRound} color="crimson" textColor="white">Stand down</Button>
           </React.Fragment>
           }
 

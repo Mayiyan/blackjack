@@ -2,11 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Button from './Button';
 
-function CompletionTile(props) {
+function CompletionTile({restartGame, winner}) {
   return (
     <React.Fragment>
-      <div>The winner is {props.winner}</div>
-      <Button onClick={props.restartGame} color="crimson" textColor="white">Restart</Button>
+      <div>The winner is {winner}</div>
+      <Button onClick={restartGame} color="crimson" textColor="white">Restart</Button>
     </React.Fragment>
 );
 }

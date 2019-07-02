@@ -18,6 +18,7 @@ const CardInsides = styled.div`
   flex-direction: column;
   justify-content: space-between;
   background-color: lemonchiffon;
+  color: ${({color}) => color};
 `;
 
 const Thing = styled.div`
@@ -32,7 +33,7 @@ const LeftThing = styled(Thing)`
   align-self: flex-end;
 `;
 
-function Card({number, suit, hiddenThing}) {
+function Card({number, suit, color, hiddenThing}) {
   const cardContent = (<React.Fragment>
     <RightThing>{number}</RightThing>
     <div>{suit}</div>
@@ -40,12 +41,13 @@ function Card({number, suit, hiddenThing}) {
   </React.Fragment>);
   const theRealInsides = hiddenThing || cardContent;
 
-  return <CardInsides hiddenThing={hiddenThing}>{theRealInsides}</CardInsides>
+  return <CardInsides hiddenThing={hiddenThing} color={color}>{theRealInsides}</CardInsides>
 }
 
 Card.propTypes = {
   number: PropTypes.string.isRequired,
   suit: PropTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
   hiddenThing: PropTypes.bool
 };
 export default Card

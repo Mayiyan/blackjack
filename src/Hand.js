@@ -24,6 +24,7 @@ function Hand({cards, hideFirstCard}) {
 const cardType = PropTypes.shape({
   number: PropTypes.string.isRequired,
   suit: PropTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
   hiddenThing: PropTypes.bool
 });
 
