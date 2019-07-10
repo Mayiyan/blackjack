@@ -14,7 +14,10 @@ const StyledApp = styled.div`
     };
 `;
 
-const Title = styled.h1`
+const ButtonWrapper =  styled.div`
+  > * {
+    margin: 10px;
+  }
 `;
 
 const initialState = () => {
@@ -67,25 +70,24 @@ class App extends React.Component {
     const gameOverMan = roundOver || busted;
     return (
       <StyledApp>
-        <Title>Blackjack!</Title>
+        <h1>Blackjack!</h1>
         <div>
-          <div>Dealer!</div>
+          <h3>Dealer!</h3>
           <Hand cards={dealerHand} hideFirstCard={hideFirstCard} />
           {roundOver && <div>The dealer's score is {scoreCalculator(dealerHand)}</div>}
         </div>
         {gameOverMan && <CompletionTile restartGame={this.restartGame} winner={winner}/>}
         <div>
-          {!gameOverMan &&
-          <React.Fragment>
-            <Button onClick={this.getCard} color="cornflowerblue">Hit meh</Button>
-            <Button onClick={this.endRound} color="crimson" textColor="white">Stand down</Button>
-          </React.Fragment>
-          }
-
-          <div>Me!</div>
+          <h3>Me!</h3>
           <Hand cards={handCards}/>
           <div>Your Score is {scoreCalculator(handCards)}</div>
           {busted && <b>You busted qq</b>}
+          {!gameOverMan &&
+          <ButtonWrapper>
+            <Button onClick={this.getCard} color="royalblue">Hit meh</Button>
+            <Button onClick={this.endRound} color="crimson">Stand down</Button>
+          </ButtonWrapper>
+          }
         </div>
       </StyledApp>
     );

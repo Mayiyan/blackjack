@@ -19,6 +19,8 @@ const CardInsides = styled.div`
   justify-content: space-between;
   background-color: lemonchiffon;
   color: ${({color}) => color};
+ 
+}
 `;
 
 const Thing = styled.div`
