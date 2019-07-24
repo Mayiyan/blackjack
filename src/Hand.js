@@ -2,6 +2,7 @@ import React from 'react';
 import Card from './Card';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import {cardType} from './propTypes';
 
 const Something = styled.div`
   display: flex;
@@ -20,13 +21,6 @@ function Hand({cards, hideFirstCard}) {
     </Something>
   );
 }
-
-const cardType = PropTypes.shape({
-  number: PropTypes.string.isRequired,
-  suit: PropTypes.string.isRequired,
-  color: PropTypes.string.isRequired,
-  hiddenThing: PropTypes.bool
-});
 
 Hand.propTypes = {
   hideFirstCard: PropTypes.bool,

@@ -1,9 +1,9 @@
 import React from 'react';
 import Hand from './Hand';
+import Player from './Player';
 import createDeck from "./deck";
 import CompletionTile from "./CompletionTile";
 import scoreCalculator from './scoreCalculator';
-import Button from './Button';
 import styled from 'styled-components';
 
 const StyledApp = styled.div`
@@ -12,12 +12,6 @@ const StyledApp = styled.div`
   > *:not(:last-child) {
     margin-bottom: 20px;
     };
-`;
-
-const ButtonWrapper =  styled.div`
-  > * {
-    margin: 10px;
-  }
 `;
 
 const initialState = () => {
@@ -73,22 +67,12 @@ class App extends React.Component {
         <h1>Blackjack!</h1>
         <div>
           <h3>Dealer!</h3>
-          <Hand cards={dealerHand} hideFirstCard={hideFirstCard} />
+          <Hand cards={dealerHand} hideFirstCard={hideFirstCard}/>
           {roundOver && <div>The dealer's score is {scoreCalculator(dealerHand)}</div>}
         </div>
         {gameOverMan && <CompletionTile restartGame={this.restartGame} winner={winner}/>}
-        <div>
-          <h3>Me!</h3>
-          <Hand cards={handCards}/>
-          <div>Your Score is {scoreCalculator(handCards)}</div>
-          {busted && <b>You busted qq</b>}
-          {!gameOverMan &&
-          <ButtonWrapper>
-            <Button onClick={this.getCard} color="royalblue">Hit meh</Button>
-            <Button onClick={this.endRound} color="crimson">Stand down</Button>
-          </ButtonWrapper>
-          }
-        </div>
+        <Player cards={handCards} busted={busted} gameOverMan={gameOverMan} getCard={this.getCard}
+                endRound={this.endRound}/>
       </StyledApp>
     );
   }
