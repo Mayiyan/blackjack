@@ -4,6 +4,7 @@ import Button from "./Button";
 import React from "react";
 import * as PropTypes from "prop-types";
 import styled from "styled-components";
+import {cardType} from "./propTypes";
 
 
 const ButtonWrapper =  styled.div`
@@ -12,9 +13,13 @@ const ButtonWrapper =  styled.div`
   }
 `;
 
-function Player({cards, busted, gameOverMan, getCard, endRound}) {
-  return <div>
-    <h3>Me!</h3>
+const PlayerWrapper = styled.div`
+  display: inline-block;
+`;
+
+function Player({cards, busted, gameOverMan, getCard, endRound, name}) {
+  return <PlayerWrapper>
+    <h3>{name}</h3>
     <Hand cards={cards}/>
     <div>Your Score is {scoreCalculator(cards)}</div>
     {busted && <b>You busted qq</b>}
@@ -24,15 +29,16 @@ function Player({cards, busted, gameOverMan, getCard, endRound}) {
       <Button onClick={endRound} color="crimson">Stand down</Button>
     </ButtonWrapper>
     }
-  </div>;
+  </PlayerWrapper>;
 }
 
 Player.propTypes = {
-  cards: PropTypes.arrayOf(PropTypes.any),
+  cards: PropTypes.arrayOf(cardType).isRequired,
   busted: PropTypes.bool,
   gameOverMan: PropTypes.bool,
-  getCard: PropTypes.func,
-  endRound: PropTypes.func
+  getCard: PropTypes.func.isRequired,
+  endRound: PropTypes.func.isRequired,
+  name: PropTypes.string.isRequired,
 };
 
 export default Player;

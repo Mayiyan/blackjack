@@ -19,26 +19,38 @@ const initialState = () => {
   return {
     deck: deck,
     dealerHand: deck.getCards(2),
-    handCards: deck.getCards(2),
-    roundOver: false,
-    busted: false,
-    winner: 'YOU',
     hideFirstCard: true,
+    player1: {
+      handCards: deck.getCards(2),
+      roundOver: false,
+      busted: false,
+      winner: 'YOU'
+    },
+    player2: {
+      handCards: deck.getCards(2),
+      roundOver: false,
+      busted: false,
+      winner: 'NOT YOU',
+    }
   }
 };
 
 class App extends React.Component {
   state = initialState();
 
-  getCard = () => {
-    const handCards = [...this.state.handCards, ...this.state.deck.getCards(1)];
-    const busted = scoreCalculator(handCards) > 21;
-    this.setState({handCards, busted, winner: busted ? 'dealer' : 'YOUUU'});
+  getCard = (player) => {
+    const handCardsPlayer = [...this.state[player].handCards, ...this.state.deck.getCards(1)];
+
+    const bustedPlayer = scoreCalculator(handCardsPlayer) > 21;
+
+    const playerState = { ...this.state[player], handCards: handCardsPlayer, busted: bustedPlayer, winner: bustedPlayer ? 'dealer' : 'You' };
+
+    this.setState({[player]: playerState});
 
   };
 
-  endRound = () => {
-    const {dealerHand, deck, winner, handCards} = this.state;
+  endRound = (player) => {
+    const {deck, dealerHand, [player]: {winner, handCards}} = this.state;
 
     let newDealerHand = dealerHand;
     let newWinner = winner;
@@ -52,7 +64,9 @@ class App extends React.Component {
       newWinner = 'dealer';
     }
 
-    this.setState({roundOver: true, deck: deck, dealerHand: newDealerHand, winner: newWinner, hideFirstCard: false})
+    const playerState = { ...this.state.player1, winner: newWinner, roundOver: true };
+
+    this.setState({deck: deck, dealerHand: newDealerHand, [player]: playerState, hideFirstCard: false})
   };
 
   restartGame = () => {
@@ -60,23 +74,28 @@ class App extends React.Component {
   };
 
   render() {
-    const {roundOver, dealerHand, handCards, busted, winner, hideFirstCard} = this.state;
-    const gameOverMan = roundOver || busted;
+    const {dealerHand, hideFirstCard, player1, player2} = this.state;
+    const gameOverMan = player1.roundOver || player1.busted;
     return (
       <StyledApp>
         <h1>Blackjack!</h1>
         <div>
           <h3>Dealer!</h3>
           <Hand cards={dealerHand} hideFirstCard={hideFirstCard}/>
-          {roundOver && <div>The dealer's score is {scoreCalculator(dealerHand)}</div>}
+          {player1.roundOver && <div>The dealer's score is {scoreCalculator(dealerHand)}</div>}
         </div>
-        {gameOverMan && <CompletionTile restartGame={this.restartGame} winner={winner}/>}
-        <Player cards={handCards} busted={busted} gameOverMan={gameOverMan} getCard={this.getCard}
-                endRound={this.endRound}/>
+        {gameOverMan && <CompletionTile restartGame={this.restartGame} winner={player1.winner}/>}
+        <div>
+          <Player cards={player1.handCards} busted={player1.busted} gameOverMan={gameOverMan} getCard={() => this.getCard('player1')}
+                  endRound={() => this.endRound('player1')} name="Me!"/>
+          <Player cards={player2.handCards} busted={player2.busted} gameOverMan={gameOverMan} getCard={() => this.getCard('player2')}
+                  endRound={() => this.endRound('player2')} name="Not Me!"/>
+        </div>
       </StyledApp>
     );
   }
 }
 
+// TOMORRROW: Both players can bust!!
 export default App;
 
