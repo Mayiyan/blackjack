@@ -5,6 +5,7 @@ import createDeck from "./deck";
 import CompletionTile from "./CompletionTile";
 import scoreCalculator from './scoreCalculator';
 import styled from 'styled-components';
+import {connect} from "react-redux";
 
 const StyledApp = styled.div`
   text-align: center;
@@ -107,6 +108,11 @@ class App extends React.Component {
   };
 
   render() {
+    console.log(
+      this.props.state, "this is the redux state"
+    )
+    console.log(this.state, "this is the component state");
+    console.log("Are they equal?", this.props.state === this.state);
     const {dealerHand, hideFirstCard} = this.state;
     const player1 = getPlayer('player1', this.state);
     const player2 = getPlayer('player2', this.state);
@@ -138,5 +144,6 @@ class App extends React.Component {
 // currently, as long as the dealer's score is less than 17 they keep hitting. There's no need to do this.
 
 // Next things: choose how many players
-export default App;
+
+export default connect((state) => ({state}))(App)
 
