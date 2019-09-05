@@ -6,6 +6,10 @@ import CompletionTile from "./CompletionTile";
 import scoreCalculator from './scoreCalculator';
 import styled from 'styled-components';
 import {connect} from "react-redux";
+import {GET_CARD, getCard} from "./actions";
+
+import PropTypes from 'prop-types';
+import {bindActionCreators} from "redux";
 
 const StyledApp = styled.div`
   text-align: center;
@@ -44,9 +48,10 @@ const getPlayer = (playerName, state) => {
 };
 
 class App extends React.Component {
-  state = initialState();
+  state = this.props.state;
 
   getCard = (playerName) => {
+    this.props.getCard();
     const player = getPlayer(playerName, this.state);
     const handCardsPlayer = [...player.handCards, ...this.state.deck.getCards(1)];
 
@@ -142,8 +147,17 @@ class App extends React.Component {
 // The dealer score should only be calculated after the game is over
 // Show individual winners (you lose or not basically)
 // currently, as long as the dealer's score is less than 17 they keep hitting. There's no need to do this.
+// The dealer is always the winner (at least when the 2nd player wins)
+// If player 1 stands, the dealer score is shown
 
 // Next things: choose how many players
 
-export default connect((state) => ({state}))(App)
+App.propTypes = {
+  state: PropTypes.object,
+  getCard: PropTypes.func,
+};
+
+const mapStateToProps = (state) => ({state});
+const mapDispatchToProps = (dispatch) => ({getCard: bindActionCreators(getCard, dispatch)});
+export default connect(mapStateToProps, mapDispatchToProps)(App)
 

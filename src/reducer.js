@@ -1,4 +1,5 @@
 import createDeck from "./deck";
+import {GET_CARD} from "./actions";
 
 const defaultState = () => {
   const deck = createDeck();
@@ -26,7 +27,11 @@ const defaultState = () => {
 
 
 export default (state = defaultState(), action) => {
+  console.log(action)
   switch (action.type) {
+    case GET_CARD:
+      console.log("hey");
+      return state
     default:
       return state
   }
