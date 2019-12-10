@@ -1,14 +1,15 @@
 import React from 'react';
 import Hand from './Hand';
 import Player from './Player';
-import CompletionTile from "./CompletionTile";
 import scoreCalculator from './scoreCalculator';
 import styled from 'styled-components';
 import {connect} from "react-redux";
 import {endRound, getCard, restartGame} from "./actions";
+import {gameOver, gameOverEveryone, getPlayer} from './reducer';
 
 import PropTypes from 'prop-types';
 import {bindActionCreators} from "redux";
+import Button from "./Button";
 
 const StyledApp = styled.div`
   text-align: center;
@@ -18,55 +19,60 @@ const StyledApp = styled.div`
     };
 `;
 
-const getPlayer = (playerName, state) => {
-  return state.players[playerName];
-};
-
 class App extends React.Component {
-  gameOver = (player, state) => {
-    const {stand, busted} = getPlayer(player, state);
-    return stand || busted;
-  };
+  eitherBothStandOrOneStandsAndOneBustsButNotBothBusting = (players) => {
+    const player1 = getPlayer('player1', players);
+    const player2 = getPlayer('player2', players);
 
-  gameOverEveryone = (state) => {
-    const gameOverMan1 = this.gameOver('player1', state);
-    const gameOverMan2 = this.gameOver('player2', state);
-    return gameOverMan1 && gameOverMan2;
+    if (player1.busted && player2.busted) {
+      return false
+    }
+
+    return gameOverEveryone(players)
   };
 
   render() {
-    const {dealerHand, hideFirstCard, endRound, getCard, restartGame} = this.props;
-    const player1 = getPlayer('player1', this.props);
-    const player2 = getPlayer('player2', this.props);
+    const {state, endRound, getCard, restartGame} = this.props;
+    const {dealerHand, hideFirstCard, players} = state;
+    const player1 = getPlayer('player1', players);
+    const player2 = getPlayer('player2', players);
+
     return (
       <StyledApp>
         <h1>Blackjack!</h1>
         <div>
           <h3>Dealer!</h3>
           <Hand cards={dealerHand} hideFirstCard={hideFirstCard}/>
-          {(player1.stand || player2.stand) && <div>The dealer's score is {scoreCalculator(dealerHand)}</div>}
+          {this.eitherBothStandOrOneStandsAndOneBustsButNotBothBusting(players) &&
+          <div>The dealer's score is {scoreCalculator(dealerHand)}</div>}
         </div>
         {
-          this.gameOverEveryone(this.props) &&
-          <CompletionTile restartGame={restartGame} winner={player1.winner}/>
+          gameOverEveryone(players) &&
+          <Button onClick={restartGame} color="crimson" textColor="white">Restart</Button>
         }
         <div>
-          <Player cards={player1.handCards} busted={player1.busted}
-                  gameOverMan={this.gameOver('player1', this.props)}
+          <Player cards={player1.handCards}
+                  busted={player1.busted}
+                  gameOverMan={gameOver('player1', players)}
+                  gameOverEveryone={gameOverEveryone(players)}
                   getCard={() => getCard('player1')}
-                  endRound={() => endRound('player1')} name="Me!"/>
-          <Player cards={player2.handCards} busted={player2.busted}
-                  gameOverMan={this.gameOver('player2', this.props)}
+                  endRound={() => endRound('player1')} name="Me!"
+          />
+          <Player cards={player2.handCards}
+                  busted={player2.busted}
+                  gameOverMan={gameOver('player2', players)}
                   getCard={() => getCard('player2')}
-                  endRound={() => endRound('player2')} name="Not Me!"/>
+                  gameOverEveryone={gameOverEveryone(players)}
+                  endRound={() => endRound('player2')} name="Not Me!"
+          />
         </div>
       </StyledApp>
     );
   }
 }
 
-// The dealer score should only be calculated after the game is over
-// Show individual winners (you lose or not basically)
+
+// Show individual winners (you lose or not basically) - We already did it, so clean up that shit and the completion tile (I think we killed the completion tile; check that)
 // currently, as long as the dealer's score is less than 17 they keep hitting. There's no need to do this.
 // The dealer is always the winner (at least when the 2nd player wins)
 // If player 1 stands, the dealer score is shown

@@ -14,39 +14,42 @@ const defaultState = () => {
           handCards: deck.getCards(2),
           stand: false,
           busted: false,
-          winner: ''
+          winner: false,
         },
         player2: {
           handCards: deck.getCards(2),
           stand: false,
           busted: false,
-          winner: '',
+          winner: false,
         }
       }
   }
 };
 
-const getPlayer = (playerName, state) => {
-  return state.players[playerName];
+export const getPlayer = (playerName, players) => {
+  return players[playerName];
 };
 
-const gameOver = (playerName, state) => {
-  const {stand, busted} = getPlayer(playerName, state);
+export const gameOver = (playerName, players) => {
+  const {stand, busted} = getPlayer(playerName, players);
   return stand || busted;
 };
 
-const gameOverEveryone = (state) => {
-  const players = state.players;
-  return Object.keys(players).every((playerName) => gameOver(playerName, state));
+export const gameOverEveryone = (players) => {
+  return Object.keys(players).every((playerName) => gameOver(playerName, players));
 };
 
+let hideFirstCard;
+let newDealerHand;
+
 export default (state = defaultState(), action) => {
+  console.log(state)
   switch (action.type) {
     case GET_CARD:
-      const player = getPlayer(action.playerName, state);
+      const player = getPlayer(action.playerName, state.players);
       const playerHandCards = [...player.handCards, ...state.deck.getCards(1)];
       const bustedPlayer = scoreCalculator(playerHandCards) > 21;
-      const playerStateGetCard = {
+      const playersStateGetCard = {
         players:
           {
             ...state.players,
@@ -54,40 +57,52 @@ export default (state = defaultState(), action) => {
               ...player,
               handCards: playerHandCards,
               busted: bustedPlayer,
-              winner: bustedPlayer ? 'dealer' : 'You'
             }
           }
       };
 
-      return { ...state, ...playerStateGetCard };
+      newDealerHand = state.dealerHand;
+
+      console.log(playersStateGetCard)
+      console.log(gameOverEveryone(playersStateGetCard.players))
+
+      if (gameOverEveryone(playersStateGetCard.players)) {
+        while (scoreCalculator(newDealerHand) < 17) {
+          newDealerHand = [...state.dealerHand, ...state.deck.getCards(1)];
+        }
+      }
+
+      hideFirstCard = !gameOverEveryone(playersStateGetCard.players);
+
+      return {
+        ...state,
+        ...playersStateGetCard,
+        hideFirstCard,
+        deck: state.deck,
+        dealerHand: newDealerHand
+      };
     case RESTART_GAME:
       return defaultState();
     case END_ROUND:
-      const {deck, dealerHand} = state;
+      const {deck, dealerHand, players} = state;
       const playerName = action.playerName;
-      const {winner, handCards} = getPlayer(playerName, state);
-      let newDealerHand = dealerHand;
-      let newWinner = winner;
+      const newPlayerState = {...getPlayer(playerName, players), stand: true};
+      const updatedPlayers = {...players, [playerName]: newPlayerState};
+      newDealerHand = dealerHand;
 
-      while (scoreCalculator(newDealerHand) < 17) {
-        newDealerHand = [...dealerHand, ...deck.getCards(1)];
+      if (gameOverEveryone(updatedPlayers)) {
+        while (scoreCalculator(newDealerHand) < 17) {
+          newDealerHand = [...dealerHand, ...deck.getCards(1)];
+        }
       }
-
-      const dealerScore = scoreCalculator(newDealerHand);
-      if (dealerScore <= 21 && dealerScore >= scoreCalculator(handCards)) {
-        newWinner = 'dealer';
-      }
-
-      const playerState = {...state.players[playerName], winner: newWinner, stand: true};
 
       const stateBeforeChange = {
         ...state,
         deck: deck,
         dealerHand: newDealerHand,
-        players: {...state.players, [playerName]: playerState}
+        players: {...updatedPlayers}
       };
-
-      const hideFirstCard = !gameOverEveryone(stateBeforeChange);
+      hideFirstCard = !gameOverEveryone(updatedPlayers);
 
       return {...stateBeforeChange, hideFirstCard};
     default:
